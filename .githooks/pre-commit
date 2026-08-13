@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#
+# Shared pre-commit hook: reject commits whose staged *.nix files are not
+# formatted with nixfmt (RFC style). This directory is wired up as
+# core.hooksPath automatically when you enter the dev shell (see the
+# shellHook in flake.nix), so collaborators get it with no per-clone setup.
+#
+# To run the checks manually:  .githooks/pre-commit
+set -euo pipefail
+
+# Staged, still-present .nix files (Added/Copied/Modified — not deletions).
+mapfile -t files < <(git diff --cached --name-only --diff-filter=ACM | grep -E '\.nix$' || true)
+[ "${#files[@]}" -eq 0 ] && exit 0
+
+if ! command -v nixfmt >/dev/null 2>&1; then
+  echo "pre-commit: nixfmt not found on PATH." >&2
+  echo "            Commit from inside 'nix develop', or install nixfmt." >&2
+  exit 1
+fi
+
+bad=()
+for f in "${files[@]}"; do
+  [ -f "$f" ] || continue
+  nixfmt --check "$f" >/dev/null 2>&1 || bad+=("$f")
+done
+
+if [ "${#bad[@]}" -gt 0 ]; then
+  echo "pre-commit: these .nix files are not nixfmt-formatted:" >&2
+  printf '  %s\n' "${bad[@]}" >&2
+  echo "Run:  nixfmt ${bad[*]}" >&2
+  echo "  (or 'nix fmt' to format the tree), then re-stage and commit." >&2
+  exit 1
+fi

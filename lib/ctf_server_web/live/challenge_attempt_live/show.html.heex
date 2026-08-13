@@ -1,0 +1,40 @@
+<.header>
+  Challenge attempt {@challenge_attempt.id}
+  <:subtitle>This is a challenge_attempt record from your database.</:subtitle>
+  <:actions>
+    <.link
+      patch={~p"/challenge_attempt/#{@challenge_attempt}/show/edit"}
+      phx-click={JS.push_focus()}
+    >
+      <.button>Edit challenge_attempt</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Group">{@challenge_attempt.group}</:item>
+  <:item title="Level">{@challenge_attempt.level}</:item>
+  <:item title="Status">
+    {@challenge_attempt.status}
+  </:item>
+  <:item title="Port">{@challenge_attempt.port}</:item>
+  <:item title="Flag">{@challenge_attempt.flag}</:item>
+</.list>
+
+<.back navigate={~p"/challenge_attempt"}>Back to challenge_attempt</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="challenge_attempt-modal"
+  show
+  on_cancel={JS.patch(~p"/challenge_attempt/#{@challenge_attempt}")}
+>
+  <.live_component
+    module={CtfServerWeb.ChallengeAttemptLive.FormComponent}
+    id={@challenge_attempt.id}
+    title={@page_title}
+    action={@live_action}
+    challenge_attempt={@challenge_attempt}
+    patch={~p"/challenge_attempt/#{@challenge_attempt}"}
+  />
+</.modal>

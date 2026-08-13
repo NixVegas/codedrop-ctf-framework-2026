@@ -1,0 +1,53 @@
+<.header>
+  Listing Challenge attempt
+  <:actions>
+    <.link patch={~p"/challenge_attempt/new"}>
+      <.button>New Challenge attempt</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="challenge_attempt"
+  rows={@streams.challenge_attempt_collection}
+  row_click={
+    fn {_id, challenge_attempt} ->
+      JS.navigate(~p"/challenge_attempt/#{challenge_attempt}")
+    end
+  }
+>
+  <:col :let={{_id, challenge_attempt}} label="Team">{challenge_attempt.team.name}</:col>
+  <:col :let={{_id, challenge_attempt}} label="Group">{challenge_attempt.group}</:col>
+  <:col :let={{_id, challenge_attempt}} label="Level">{challenge_attempt.level}</:col>
+  <:col :let={{_id, challenge_attempt}} label="Status">{challenge_attempt.status}</:col>
+  <:action :let={{_id, challenge_attempt}}>
+    <div class="sr-only">
+      <.link navigate={~p"/challenge_attempt/#{challenge_attempt}"}>Show</.link>
+    </div>
+    <.link patch={~p"/challenge_attempt/#{challenge_attempt}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, challenge_attempt}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: challenge_attempt.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="challenge_attempt-modal"
+  show
+  on_cancel={JS.patch(~p"/challenge_attempt")}
+>
+  <.live_component
+    module={CtfServerWeb.ChallengeAttemptLive.FormComponent}
+    id={@challenge_attempt.id || :new}
+    title={@page_title}
+    action={@live_action}
+    challenge_attempt={@challenge_attempt}
+    patch={~p"/challenge_attempt"}
+  />
+</.modal>

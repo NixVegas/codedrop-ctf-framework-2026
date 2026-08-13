@@ -1,0 +1,34 @@
+<%!-- Peer (web/poller) node: no forwarded SSH port (no ctf:hook ssh-port), and
+    locked to the strict ctf-cluster-internal egress filter — it can reach only
+    its cluster siblings on the attempt's /24, never the gateway or the internet. --%>
+<domain type="kvm">
+  <name><%= domain_name %></name>
+  <%= if hub_mode do %>
+  <metadata>
+    <%!-- Marker only asks the qemu hook to put this bridge port into hub mode so
+        the ingress can capture the peers' traffic. --%>
+    <ctf:hook xmlns:ctf="https://nixc.tf/xmlns/qemu-hook/1" hub-mode="on"/>
+  </metadata>
+  <% end %>
+  <memory unit="MiB">1024</memory>
+  <vcpu>1</vcpu>
+  <%= os_block %>
+  <%= cpu_block %>
+  <devices>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source file="<%= image_path %>"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+    <interface type="network">
+      <source network="<%= network_name %>"/>
+      <mac address="<%= guest_mac %>"/>
+      <model type="virtio"/>
+      <filterref filter='ctf-cluster-internal'>
+        <parameter name='SUBNET' value='<%= subnet %>'/>
+      </filterref>
+    </interface>
+    <serial type="pty"/>
+    <console type="pty"/>
+  </devices>
+</domain>

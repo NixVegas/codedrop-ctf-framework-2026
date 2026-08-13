@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="CtfServer" suffix=" · NixCTF">
+      {assigns[:page_title]}
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+
+  <body class="bg-white text-zinc-900">
+    <nav class="border-b border-zinc-200 px-4 py-3 sm:px-6 lg:px-8">
+      <ul class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+        <%= if @current_team do %>
+          <li class="text-zinc-600">{@current_team.email}</li>
+          <li>
+            <.link href={~p"/dashboard"} class="font-semibold hover:underline">Dashboard</.link>
+          </li>
+          <li>
+            <.link href={~p"/leaderboard"} class="font-semibold hover:underline">
+              Leaderboard
+            </.link>
+          </li>
+          <li>
+            <.link href={~p"/feed"} class="font-semibold hover:underline">Activity</.link>
+          </li>
+          <li>
+            <.link href={~p"/teams/settings"} class="font-semibold hover:underline">
+              Settings
+            </.link>
+          </li>
+          <li
+            :if={@current_team.is_admin}
+            class="flex items-center gap-4 border-l border-zinc-200 pl-4"
+          >
+            <span class="text-zinc-500">Admin</span>
+            <.link href={~p"/admin/teams"} class="font-semibold hover:underline">Teams</.link>
+            <.link href={~p"/admin/vms"} class="font-semibold hover:underline">VMs</.link>
+            <.link href={~p"/admin/audit"} class="font-semibold hover:underline">Audit</.link>
+            <.link href={~p"/admin/feed"} class="font-semibold hover:underline">Activity</.link>
+            <.link href={~p"/admin/invites"} class="font-semibold hover:underline">Invites</.link>
+            <.link href={~p"/admin/manual"} class="font-semibold hover:underline">Manual</.link>
+            <.link href={~p"/admin/competition"} class="font-semibold hover:underline">
+              Competition
+            </.link>
+          </li>
+          <li class="border-l border-zinc-200 pl-4">
+            <.link href={~p"/teams/log_out"} method="delete" class="font-semibold hover:underline">
+              Log out
+            </.link>
+          </li>
+        <% else %>
+          <li>
+            <.link href={~p"/teams/register"} class="font-semibold hover:underline">
+              Register
+            </.link>
+          </li>
+          <li>
+            <.link href={~p"/teams/log_in"} class="font-semibold hover:underline">Log in</.link>
+          </li>
+        <% end %>
+      </ul>
+    </nav>
+    {@inner_content}
+  </body>
+</html>

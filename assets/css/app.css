@@ -1,0 +1,41 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/*
+@import "tailwindcss";
+This file is for your main application CSS
+@config "../tailwind.config.js";
+*/
+
+/*
+ * Challenge descriptions are rendered from markdown (see ChallengeLive), so
+ * they're the one place we can't reach with utility classes on the markup.
+ *
+ * De-designed (#106): this used to be ~200 lines of hand-rolled @apply rules,
+ * one per tag, plus a duplicated prefers-color-scheme block. It's now the
+ * typography plugin's defaults. The visual pass can restyle markdown by
+ * setting prose modifiers here rather than by editing per-tag rules.
+ */
+.challenge-description {
+    @apply prose prose-zinc max-w-none;
+}
+
+/*
+ * Two-tier measure. The column is sized for the widest thing we ship (the SSH
+ * command in a challenge's code block), which is far wider than a comfortable
+ * reading line. So prose *text* is capped at ~70ch while code blocks, tables,
+ * and images keep the full column width.
+ *
+ * This is why the container above is max-w-none rather than the typography
+ * plugin's default 65ch: that default would cap the <pre> elements too, which
+ * is exactly backwards.
+ */
+.challenge-description > :where(p, ul, ol, dl, blockquote, h1, h2, h3, h4, h5, h6) {
+    @apply max-w-[70ch];
+}
+
+/* Code blocks in descriptions are wide; let them scroll rather than overflow. */
+.challenge-description pre {
+    @apply overflow-x-auto;
+}

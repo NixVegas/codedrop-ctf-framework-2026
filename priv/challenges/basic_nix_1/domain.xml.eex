@@ -1,0 +1,28 @@
+<domain type="kvm">
+  <name><%= domain_name %></name>
+  <metadata>
+    <ctf:hook xmlns:ctf="https://nixc.tf/xmlns/qemu-hook/1" ssh-port="<%= ssh_port %>" guest-ip="<%= guest_ip %>"/>
+  </metadata>
+  <memory unit="MiB">1024</memory>
+  <vcpu>1</vcpu>
+  <%= os_block %>
+  <%= cpu_block %>
+  <devices>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source file="<%= image_path %>"/>
+      <target dev="vda" bus="virtio"/>
+    </disk>
+    <interface type="network">
+      <source network="<%= network_name %>"/>
+      <mac address="<%= guest_mac %>"/>
+      <model type="virtio"/>
+      <filterref filter='ctf-egress'>
+        <parameter name='GATEWAY' value='<%= gateway_ip %>'/>
+        <parameter name='SUBNET' value='<%= subnet %>'/>
+      </filterref>
+    </interface>
+    <serial type="pty"/>
+    <console type="pty"/>
+  </devices>
+</domain>
